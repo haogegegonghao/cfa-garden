@@ -1,0 +1,951 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 26 26%22%3E%3Cpath d=%22M13 24V12%22 stroke=%22%234F8460%22 stroke-width=%222%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M13 15c-5 0-7-3-7-7 4 0 7 2 7 7z%22 fill=%22%234F8460%22/%3E%3Cpath d=%22M13 12c0-5 3-8 8-8 0 5-3 8-8 8z%22 fill=%22%23C94F72%22/%3E%3C/svg%3E">
+<title>CFA 小花园</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&family=Long+Cang&family=Noto+Serif+SC:wght@600;900&display=swap">
+<style>
+/* Layout: a study garden. Sticky header + tab row; each view is one calm column (max 1040px).
+   The one bold moment is the Today hero: a big italic countdown beside a handwritten note from him. */
+:root{
+  --paper:#FBF5F6;      /* blush paper */
+  --card:#FFFFFF;
+  --ink:#2A2131;        /* plum ink */
+  --muted:#76697C;
+  --line:#EBDDE2;
+  --rose:#C94F72;       /* accent: petals */
+  --rose-soft:#F6DCE4;
+  --leaf:#4F8460;       /* done / growth */
+  --leaf-soft:#DDEBDF;
+  --gold:#B8862C;       /* finance gold: flower hearts, milestones */
+  --gold-soft:#F5E8CC;
+  --soil:#E6D8DC;
+  --note:#FFFBEA;       /* the paper of his notes */
+  --note-ink:#3B2E22;
+  --shadow:0 1px 2px rgba(60,30,50,.06),0 8px 24px rgba(60,30,50,.07);
+
+  --f-display:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-num:"Fraunces","Iowan Old Style",Georgia,serif;
+  --f-body:"Inter",-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --f-hand:"Long Cang","Kaiti SC","STKaiti","KaiTi",cursive;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#1B161F;--card:#251E2A;--ink:#F2E9EF;--muted:#A99BAD;--line:#3A2F40;
+  --rose:#EE7E9E;--rose-soft:#4A2734;--leaf:#83BB93;--leaf-soft:#22362A;--gold:#E2B862;--gold-soft:#3E3220;
+  --soil:#3A3040;--note:#2F2A22;--note-ink:#F3E6CF;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#1B161F;--card:#251E2A;--ink:#F2E9EF;--muted:#A99BAD;--line:#3A2F40;
+  --rose:#EE7E9E;--rose-soft:#4A2734;--leaf:#83BB93;--leaf-soft:#22362A;--gold:#E2B862;--gold-soft:#3E3220;
+  --soil:#3A3040;--note:#2F2A22;--note-ink:#F3E6CF;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+a{color:var(--rose)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--rose);outline-offset:2px;border-radius:6px}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;text-wrap:balance;margin:0;line-height:1.3}
+.wrap{max-width:1040px;margin:0 auto}
+.en{font-family:var(--f-body);font-weight:400;color:var(--muted);font-size:.82em;letter-spacing:.01em}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+
+/* header */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line);margin-left:calc(-1*max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1*max(16px,env(safe-area-inset-right,0px)));padding:12px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
+.brand{display:flex;align-items:center;gap:10px;justify-content:space-between;max-width:1040px;margin:0 auto}
+.brand-l{display:flex;align-items:center;gap:10px;min-width:0}
+.brand h1{font-size:20px;font-weight:900;letter-spacing:.02em}
+.brand h1 b{font-family:var(--f-num);font-weight:600;font-style:italic;color:var(--rose);margin-right:2px}
+.sync{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--soil);display:inline-block}
+.sync[data-s="cloud"] i{background:var(--leaf)}
+.sync[data-s="local"] i{background:var(--gold)}
+nav.tabs{max-width:1040px;margin:8px auto 0;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs a{flex:none;text-decoration:none;color:var(--muted);padding:8px 12px 10px;border-bottom:2px solid transparent;font-weight:500;white-space:nowrap}
+nav.tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--rose)}
+nav.tabs a .badge{font-size:11px;background:var(--rose);color:var(--paper);border-radius:9px;padding:0 6px;margin-left:4px;vertical-align:1px}
+
+main{padding-top:28px}
+section.view{display:flex;flex-direction:column;gap:40px}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:6px 16px;flex-wrap:wrap;margin-bottom:14px}
+.sec-h h2{font-size:22px}
+.sec-h p{margin:0}
+
+/* buttons & inputs */
+.btn{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 16px;cursor:pointer;font-weight:500;transition:transform .12s,background .12s}
+.btn:hover{border-color:var(--rose)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--rose);border-color:var(--rose);color:var(--paper)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn[disabled]{opacity:.5;cursor:default}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:4px 12px;cursor:pointer;font-size:13px;color:var(--muted)}
+.chip:hover{border-color:var(--rose)}
+.chip[aria-pressed="true"]{background:var(--rose-soft);border-color:var(--rose);color:var(--ink)}
+input[type=text],input[type=number],input[type=date],select,textarea{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 10px;max-width:100%}
+textarea{width:100%;resize:vertical;min-height:80px;line-height:1.6}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+
+/* TODAY hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:36px;align-items:center}
+.count .greet{font-family:var(--f-display);font-size:20px}
+.count .big{display:flex;align-items:baseline;gap:10px;margin:6px 0 6px}
+.count .big b{font-family:var(--f-num);font-style:italic;font-weight:500;font-size:clamp(84px,14vw,148px);line-height:.9;color:var(--rose);letter-spacing:-.03em;font-variation-settings:"opsz" 144}
+.count .big span{font-family:var(--f-display);font-size:22px}
+.count .sub{color:var(--muted)}
+.stats{display:flex;gap:28px;flex-wrap:wrap;margin-top:22px}
+.stat{display:flex;flex-direction:column}
+.stat b{font-family:var(--f-num);font-size:30px;font-weight:500;line-height:1.1}
+.stat small{color:var(--muted);font-size:12px}
+.hbar{height:6px;border-radius:3px;background:var(--soil);overflow:hidden;margin-top:6px;width:160px;max-width:100%}
+.hbar i{display:block;height:100%;background:var(--leaf);border-radius:3px}
+
+.note{position:relative;background:var(--note);color:var(--note-ink);padding:28px 26px 22px;border-radius:4px;box-shadow:var(--shadow);transform:rotate(1.2deg)}
+.note::before{content:"";position:absolute;top:-11px;left:50%;width:92px;height:22px;transform:translateX(-50%) rotate(-3deg);background:var(--rose-soft);opacity:.85;border-radius:2px}
+.note .from{font-size:12px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;font-weight:600}
+.note .txt{font-family:var(--f-hand);font-size:30px;line-height:1.35;margin:10px 0 12px;white-space:pre-wrap;word-break:break-word}
+.note .meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.note .heart{color:var(--rose);font-size:18px}
+
+/* today: plan + log */
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.focus-t{font-family:var(--f-display);font-size:24px;margin:6px 0 4px}
+.mods{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:2px}
+.mods li label{display:flex;gap:10px;align-items:flex-start;padding:6px 4px;border-radius:8px;cursor:pointer}
+.mods li label:hover{background:var(--paper)}
+.mods input{accent-color:var(--leaf);margin-top:5px;flex:none}
+.mods li.done span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--leaf)}
+.logrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.log-ok{font-size:13px;color:var(--leaf);min-height:20px;margin-top:8px}
+
+/* garden */
+.garden-wrap{overflow-x:auto}
+.garden{display:grid;grid-template-columns:52px repeat(7,minmax(30px,44px));gap:4px;justify-content:start;min-width:300px}
+.garden .dow{font-size:11px;color:var(--muted);text-align:center}
+.garden .mon{font-size:11px;color:var(--muted);align-self:center;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cell{aspect-ratio:1;max-width:100%;border-radius:8px;display:grid;place-items:center;position:relative}
+.cell .soil{width:5px;height:5px;border-radius:50%;background:var(--soil)}
+.cell.future .soil{opacity:.45}
+.cell.today{box-shadow:inset 0 0 0 1.5px var(--rose)}
+.cell.exam{background:var(--gold-soft)}
+.cell svg{width:86%;height:86%;overflow:visible}
+.cell.pop svg{animation:pop .7s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{0%{transform:scale(.2) rotate(-40deg)}100%{transform:scale(1) rotate(0)}}
+.garden-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px;align-items:center}
+.garden-legend span{display:inline-flex;align-items:center;gap:4px}
+.garden-legend svg{width:18px;height:18px}
+.garden-side{display:grid;grid-template-columns:auto minmax(0,1fr);gap:40px;align-items:start}
+
+.miles{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.mile{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.mile b{font-family:var(--f-num);font-size:20px;font-weight:500}
+.mile .st{font-size:12px;color:var(--muted);white-space:nowrap}
+.mile.got b{color:var(--gold)}
+.mile.got .st{color:var(--gold);font-weight:600}
+
+/* map */
+.topic{border-top:1px solid var(--line);padding:14px 0}
+.topic:last-child{border-bottom:1px solid var(--line)}
+.t-head{display:grid;grid-template-columns:minmax(0,1fr) 120px 150px 24px;gap:16px;align-items:center;cursor:pointer;background:none;border:0;width:100%;text-align:left;padding:0}
+.t-name{font-family:var(--f-display);font-size:18px}
+.t-name .en{display:block;font-size:12px}
+.wbar{font-size:12px;color:var(--muted)}
+.wbar .w{height:6px;background:var(--soil);border-radius:3px;position:relative;margin-top:4px}
+.wbar .w i{position:absolute;top:0;bottom:0;background:var(--gold);border-radius:3px;opacity:.85}
+.pbar .p{height:6px;background:var(--soil);border-radius:3px;margin-top:4px;overflow:hidden}
+.pbar .p i{display:block;height:100%;background:var(--leaf)}
+.pbar{font-size:12px;color:var(--muted)}
+.caret{transition:transform .2s;color:var(--muted);font-size:20px}
+.topic.open .caret{transform:rotate(90deg)}
+.t-body{display:none;padding:12px 0 4px;gap:14px;flex-direction:column}
+.topic.open .t-body{display:flex}
+.why{background:var(--rose-soft);border-radius:12px;padding:10px 14px;font-size:14px;max-width:72ch}
+.why b{color:var(--rose)}
+.conf{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.mods.cols{columns:2;column-gap:28px;display:block}
+.mods.cols li{break-inside:avoid}
+
+/* plan */
+.plan-set{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end}
+.plan-sum{display:flex;gap:28px;flex-wrap:wrap;margin-top:18px}
+.warn{background:var(--gold-soft);border-radius:12px;padding:10px 14px;font-size:14px;margin-top:14px;max-width:72ch}
+.weeks{display:flex;flex-direction:column;margin-top:8px}
+.week{display:grid;grid-template-columns:96px minmax(0,1fr) 48px;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.week .wk{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
+.week .wk b{display:block;color:var(--ink);font-family:var(--f-num);font-size:16px;font-weight:500}
+.week .hrs{text-align:right;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.week.now{background:linear-gradient(90deg,var(--rose-soft),transparent 85%);border-radius:10px;padding-left:10px;margin-left:-10px}
+.week.past{opacity:.55}
+.week .phase{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--leaf);margin-right:8px}
+.week .phase.rv{color:var(--gold)}
+.week .phase.mk{color:var(--rose)}
+.tag{display:inline-block;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:0 10px;font-size:13px;margin:2px 4px 2px 0}
+
+/* flashcards */
+.fc-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.flash{perspective:1200px;max-width:620px;margin:0 auto;width:100%}
+.flash-in{position:relative;min-height:290px;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
+.flash.flipped .flash-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow);overflow:auto}
+.face.back{transform:rotateY(180deg)}
+.face .ttag{font-size:12px;color:var(--muted);letter-spacing:.06em}
+.face .q{font-family:var(--f-display);font-size:26px;margin:auto 0}
+.face .fx{font-family:var(--f-num);font-size:19px;background:var(--paper);border-radius:10px;padding:10px 14px;overflow-x:auto}
+.face .tip{font-size:14px;color:var(--muted)}
+.face .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:auto}
+.fc-act{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.boxes{display:flex;gap:6px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.boxes span{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:2px 8px}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.empty h3{color:var(--ink);font-size:20px;margin-bottom:6px}
+
+/* quiz */
+.qcard{max-width:720px}
+.qmeta{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted);margin-bottom:8px;flex-wrap:wrap}
+.qtext{font-size:17px;margin:0 0 16px;max-width:68ch}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 14px;cursor:pointer}
+.opt:hover:not([disabled]){border-color:var(--rose)}
+.opt b{font-family:var(--f-num);font-weight:600}
+.opt.right{border-color:var(--leaf);background:var(--leaf-soft)}
+.opt.wrong{border-color:var(--rose);background:var(--rose-soft)}
+.opt[disabled]{cursor:default}
+.explain{margin-top:16px;border-left:3px solid var(--leaf);padding:4px 0 4px 14px;max-width:68ch}
+.explain.bad{border-left-color:var(--rose)}
+.explain p{margin:4px 0}
+.qnav{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.acc{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px 24px}
+.acc div{font-size:13px;display:flex;flex-direction:column;gap:4px}
+.acc .p{height:5px;background:var(--soil);border-radius:3px;overflow:hidden}
+.acc .p i{display:block;height:100%;background:var(--leaf)}
+.result-big{font-family:var(--f-num);font-size:64px;font-style:italic;color:var(--rose);line-height:1;margin:6px 0}
+
+/* notes */
+.notes{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px}
+.notes .note{transform:rotate(var(--r,0deg))}
+.notes .note .txt{font-size:26px}
+.compose{display:flex;flex-direction:column;gap:10px;max-width:640px}
+.cfg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.del{background:none;border:0;color:var(--muted);cursor:pointer;font-size:12px;padding:0}
+.del:hover{color:var(--rose)}
+
+/* tutor */
+.chat{display:flex;flex-direction:column;gap:14px;max-width:760px}
+.msg{padding:12px 16px;border-radius:16px;white-space:pre-wrap;word-break:break-word;max-width:92%}
+.msg.me{align-self:flex-end;background:var(--rose-soft)}
+.msg.ai{align-self:flex-start;background:var(--card);border:1px solid var(--line)}
+.msg.err{align-self:flex-start;color:var(--rose);font-size:14px}
+.presets{display:flex;gap:8px;flex-wrap:wrap;max-width:760px}
+.ask{display:flex;gap:10px;align-items:flex-end;max-width:760px}
+.ask textarea{min-height:52px}
+
+.foot{margin-top:56px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;max-width:72ch}
+
+.petal{position:fixed;pointer-events:none;z-index:50;width:14px;height:14px;border-radius:70% 0 70% 0;background:var(--rose);opacity:.9}
+
+@media (max-width:860px){
+  .garden-side{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:760px){
+  .hero,.two{grid-template-columns:minmax(0,1fr)}
+  .note{transform:rotate(.6deg)}
+  .t-head{grid-template-columns:minmax(0,1fr) 90px 20px}
+  .t-head .wbar{display:none}
+  .mods.cols{columns:1}
+  .week{grid-template-columns:74px minmax(0,1fr)}
+  .week .hrs{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+<style>html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="brand-l">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M13 24V12" stroke="var(--leaf)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M13 15c-5 0-7-3-7-7 4 0 7 2 7 7z" fill="var(--leaf)"/><path d="M13 12c0-5 3-8 8-8 0 5-3 8-8 8z" fill="var(--rose)"/></svg>
+      <h1><b>CFA</b> 小花园</h1>
+    </div>
+    <div class="sync" id="sync" data-s="none"><i></i><span>正在连接…</span></div>
+  </div>
+  <nav class="tabs" id="tabs" aria-label="页面">
+    <a href="#today" data-v="today">今天</a>
+    <a href="#plan" data-v="plan">学习计划</a>
+    <a href="#map" data-v="map">知识地图</a>
+    <a href="#cards" data-v="cards">公式闪卡<span class="badge" id="dueBadge" hidden></span></a>
+    <a href="#quiz" data-v="quiz">练习题</a>
+    <a href="#tutor" data-v="tutor" id="tutorTab" hidden>问助教</a>
+    <a href="#notes" data-v="notes">他的留言</a>
+  </nav>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<script>
+/* ============================== CONTENT ============================== */
+const TOPICS=[
+ {id:'ethics',cn:'道德与职业标准',en:'Ethical and Professional Standards',w:[15,20],conf:1,
+  why:'<b>全新内容，权重最高。</b>案例题有很重的「CFA 味道」：同一个情景，换一个细节答案就变。少背条文，多做题、多看解析。第一轮放在最后学，让它离考试最近；平时每周留 20 分钟做几道。',
+  mods:['Ethics and Trust in the Investment Profession','Code of Ethics and Standards of Professional Conduct','Guidance for Standards I–VII','Introduction to the Global Investment Performance Standards (GIPS)','Ethics Application']},
+ {id:'quant',cn:'数量方法',en:'Quantitative Methods',w:[6,9],conf:2,
+  why:'<b>经济学底子在，</b>统计和回归会很快。真正要花时间的是把 BA II Plus 计算器按熟：TVM、NPV/IRR、统计功能后面每一科都要用。适合作为热身第一科。',
+  mods:['Rates and Returns','Time Value of Money in Finance','Statistical Measures of Asset Returns','Probability Trees and Conditional Expectations','Portfolio Mathematics','Simulation Methods','Estimation and Inference','Hypothesis Testing','Parametric and Non-Parametric Tests of Independence','Simple Linear Regression','Introduction to Big Data Techniques']},
+ {id:'econ',cn:'经济学',en:'Economics',w:[6,9],conf:3,
+  why:'<b>你的主场。</b>市场结构、货币政策这些本科都学过，快速过一遍就好。唯一要专门练的是汇率计算（cross rate、forward points），把省下的时间留给 FSA。',
+  mods:['Firms and Market Structures','Understanding Business Cycles','Fiscal Policy','Monetary Policy','Introduction to Geopolitics','International Trade','Capital Flows and the FX Market','Exchange Rate Calculations']},
+ {id:'fsa',cn:'财务报表分析',en:'Financial Statement Analysis',w:[11,14],conf:1,
+  why:'<b>经济学背景最需要啃的一科，</b>也是权重最大的几科之一。存货（FIFO/LIFO）、长期资产、所得税、现金流量表是高频考点，IFRS 和 US GAAP 的差异一定要整理成表。',
+  mods:['Introduction to Financial Statement Analysis','Analyzing Income Statements','Analyzing Balance Sheets','Analyzing Statements of Cash Flows I','Analyzing Statements of Cash Flows II','Analysis of Inventories','Analysis of Long-Term Assets','Topics in Long-Term Liabilities and Equity','Analysis of Income Taxes','Financial Reporting Quality','Financial Analysis Techniques','Introduction to Financial Statement Modeling']},
+ {id:'corp',cn:'公司发行人',en:'Corporate Issuers',w:[6,9],conf:2,
+  why:'公司治理、营运资本、资本预算和资本结构。和 FSA 连着学效果最好：WACC、NPV 这些也会在权益估值里再出现。',
+  mods:['Organizational Forms, Corporate Issuer Features, and Ownership','Investors and Other Stakeholders','Corporate Governance: Conflicts, Mechanisms, Risks, and Benefits','Working Capital and Liquidity','Capital Investments and Capital Allocation','Capital Structure','Business Models']},
+ {id:'equity',cn:'权益投资',en:'Equity Investments',w:[11,14],conf:2,
+  why:'市场结构、指数编制、有效市场和估值模型。保证金交易（margin）和指数计算是送分题，DDM 和乘数估值要会算也要会解释。',
+  mods:['Market Organization and Structure','Security Market Indexes','Market Efficiency','Overview of Equity Securities','Company Analysis: Past and Present','Industry and Competitive Analysis','Company Analysis: Forecasting','Equity Valuation: Concepts and Basic Tools']},
+ {id:'fi',cn:'固定收益',en:'Fixed Income',w:[11,14],conf:2,
+  why:'<b>和保险资金最贴近的一科。</b>寿险负债久期长，资产端天然关心久期匹配（duration matching）和利率风险，课本里的 duration、convexity、credit spread 可以对照工作去理解。模块最多（19 个），要留够时间。',
+  mods:['Fixed-Income Instrument Features','Fixed-Income Cash Flows and Types','Fixed-Income Issuance and Trading','Fixed-Income Markets for Corporate Issuers','Fixed-Income Markets for Government Issuers','Fixed-Income Bond Valuation: Prices and Yields','Yield and Yield Spread Measures for Fixed-Rate Bonds','Yield and Yield Spread Measures for Floating-Rate Instruments','The Term Structure of Interest Rates: Spot, Par, and Forward Curves','Interest Rate Risk and Return','Yield-Based Bond Duration Measures and Properties','Yield-Based Bond Convexity and Portfolio Properties','Curve-Based and Empirical Fixed-Income Risk Measures','Credit Risk','Credit Analysis for Government Issuers','Credit Analysis for Corporate Issuers','Fixed-Income Securitization','Asset-Backed Security (ABS) Instrument and Market Features','Mortgage-Backed Security (MBS) Instrument and Market Features']},
+ {id:'deriv',cn:'衍生品',en:'Derivatives',w:[5,8],conf:1,
+  why:'公式多但主线只有一条：<b>无套利（no-arbitrage）和复制（replication）。</b>远期定价、put–call parity、一期二叉树都是从这一条推出来的，理解了就不用死记。',
+  mods:['Derivative Instrument and Derivative Market Features','Forward Commitment and Contingent Claim Features and Instruments','Derivative Benefits, Risks, and Issuer and Investor Uses','Arbitrage, Replication, and the Cost of Carry in Pricing Derivatives','Pricing and Valuation of Forward Contracts and for an Underlying with Varying Maturities','Pricing and Valuation of Futures Contracts','Pricing and Valuation of Interest Rates and Other Swaps','Pricing and Valuation of Options','Option Replication Using Put–Call Parity','Valuing a Derivative Using a One-Period Binomial Model']},
+ {id:'alt',cn:'另类投资',en:'Alternative Investments',w:[7,10],conf:2,
+  why:'海外投资会碰到的 PE、私募债、不动产、基础设施都在这里，读起来会有熟悉感。费用计算（2 and 20、hurdle、high-water mark）是必考计算题。',
+  mods:['Alternative Investment Features, Methods, and Structures','Alternative Investment Performance and Returns','Investments in Private Capital: Equity and Debt','Real Estate and Infrastructure','Natural Resources','Hedge Funds','Introduction to Digital Assets']},
+ {id:'pm',cn:'投资组合管理',en:'Portfolio Management',w:[8,12],conf:2,
+  why:'CAPM、有效前沿、IPS、行为金融和风险管理。硕士阶段大概率接触过，当作系统复习；行为偏差的分类（cognitive vs emotional）要背清楚。',
+  mods:['Portfolio Management: An Overview','Portfolio Risk and Return: Part I','Portfolio Risk and Return: Part II','Basics of Portfolio Planning and Construction','The Behavioral Biases of Individuals','Introduction to Risk Management']}
+];
+const T=Object.fromEntries(TOPICS.map(t=>[t.id,t]));
+const ORDER=['quant','fsa','corp','equity','fi','deriv','alt','pm','econ','ethics'];
+
+const CARDS=[
+ ['quant','有效年利率 EAR','EAR = (1 + r/m)^m − 1','名义年利率 r、每年复利 m 次。连续复利时 EAR = e^r − 1。'],
+ ['quant','持有期收益 HPR','HPR = (P₁ − P₀ + D₁) / P₀','分红也算收益。多期收益用几何平均：[(1+R₁)…(1+Rₙ)]^(1/n) − 1。'],
+ ['quant','Sharpe ratio','(R̄ₚ − R_f) / σₚ','每单位总风险的超额收益。只用 σ，所以适合评价整体组合。'],
+ ['quant','变异系数 CV','CV = s / X̄','每单位收益承担多少风险，越小越好。'],
+ ['quant','均值的 t 检验统计量','t = (X̄ − μ₀) / (s / √n)','自由度 n − 1。总体方差未知、样本均值检验时用。'],
+ ['quant','Type I vs Type II error','Type I：拒绝了真的 H₀；Type II：没拒绝假的 H₀','显著性水平 α = P(Type I)。检验势 power = 1 − P(Type II)。'],
+ ['quant','Bayes 公式','P(A|B) = P(B|A)·P(A) / P(B)','先验 → 看到新信息 → 后验。概率树题型常考。'],
+ ['econ','Fisher 关系','(1 + 名义利率) = (1 + 实际利率)(1 + 通胀)','近似：名义 ≈ 实际 + 通胀。'],
+ ['econ','远期汇率与利率平价','F / S = (1 + i_price) / (1 + i_base)','报价 A/B 中 B 是 base currency。利率高的货币远期贴水。'],
+ ['econ','完全竞争的长期均衡','P = MR = MC = 最低 ATC','长期经济利润为零。垄断竞争长期也是零经济利润，但有过剩产能。'],
+ ['fsa','杜邦三因素','ROE = NI/Sales × Sales/Assets × Assets/Equity','净利率 × 资产周转率 × 权益乘数。看 ROE 变化来自哪一项。'],
+ ['fsa','速动比率 Quick ratio','(现金 + 短期投资 + 应收) / 流动负债','不含存货和预付。比 current ratio 更保守。'],
+ ['fsa','物价上涨时 LIFO vs FIFO','LIFO：COGS↑ 净利润↓ 存货↓ 税↓ CFO↑','IFRS 禁止 LIFO，只有 US GAAP 允许。'],
+ ['fsa','间接法 CFO','NI + 非现金费用 − 营运资本增加','应收、存货增加 → 减；应付增加 → 加。处置资产利得要减掉。'],
+ ['fsa','IFRS vs US GAAP 现金流分类','利息/股利收付：IFRS 可选；US GAAP 固定','US GAAP：付利息、收利息、收股利 → CFO；付股利 → CFF。'],
+ ['fsa','资本化 vs 费用化','资本化：当期 NI↑、CFO↑、CFI↓、资产↑','总现金流不变，只是分类不同。后期折旧让 NI 变低。'],
+ ['corp','WACC','w_d·r_d·(1 − t) + w_p·r_p + w_e·r_e','债务成本要乘 (1 − t)，因为利息可抵税。权重用目标资本结构的市值。'],
+ ['corp','现金转换周期 CCC','CCC = DOH + DSO − DPO','越短越好：钱在存货和应收里停留的天数，减去拖欠供应商的天数。'],
+ ['corp','NPV 与 IRR 冲突时','互斥项目以 NPV 为准','IRR 隐含按 IRR 再投资，NPV 隐含按资本成本再投资，后者更合理。'],
+ ['corp','经营杠杆 DOL','DOL = %ΔEBIT / %ΔSales','固定成本越高，DOL 越大。DFL = %ΔEPS / %ΔEBIT。'],
+ ['equity','Gordon 增长模型','V₀ = D₁ / (r − g)','D₁ = D₀(1 + g)。要求 r > g。题目给 D₀ 时别忘了乘 (1+g)。'],
+ ['equity','合理市盈率 Justified P/E','P₀/E₁ = (D₁/E₁) / (r − g)','分子是分红率 payout ratio。'],
+ ['equity','保证金杠杆','杠杆倍数 = 1 / 初始保证金率','追加保证金价格 = P₀ × (1 − IM) / (1 − MM)。'],
+ ['equity','有效市场三种形式','弱式：历史价格；半强式：+全部公开信息；强式：+内幕信息','半强式下技术分析和基本面分析都无法持续获得超额收益。'],
+ ['fi','修正久期','ModDur = MacDur / (1 + r/m)','r 是每期 YTM。衡量收益率变动 1% 时价格的近似百分比变化。'],
+ ['fi','价格变化近似','%ΔP ≈ −ModDur·Δy + ½·Convexity·(Δy)²','凸性项永远为正（普通债券），所以涨跌不对称：跌得少、涨得多。'],
+ ['fi','PVBP / Money duration','PVBP ≈ (P₋ − P₊) / 2，收益率各动 1bp','保险资产负债管理常用 money duration 做匹配。'],
+ ['fi','预期信用损失','Expected loss = PD × LGD','LGD = (1 − 回收率) × 敞口。信用利差 ≈ PD × LGD。'],
+ ['fi','即期与远期利率','(1 + S₂)² = (1 + S₁)(1 + f₁,₁)','两年即期 = 一年即期接一年后的一年远期。无套利。'],
+ ['fi','溢价 / 平价 / 折价','票息 > YTM → 溢价；= → 平价；< → 折价','临近到期价格向面值收敛（pull to par）。'],
+ ['deriv','Put–call parity','S₀ + P₀ = C₀ + PV(X)','保护性看跌 = 信托看涨。可以用来复制任何一个缺失的工具。'],
+ ['deriv','远期价格（无持有收益/成本）','F₀(T) = S₀ × (1 + r)^T','有收益时减去收益现值，有成本时加上成本现值。'],
+ ['deriv','一期二叉树风险中性概率','π = (1 + r − d) / (u − d)','期权价值 = [π·C_u + (1 − π)·C_d] / (1 + r)。'],
+ ['alt','资本化率 Cap rate','Cap rate = NOI / 价值','价值 = NOI / cap rate。cap rate 越低，估值越高。'],
+ ['alt','2 and 20','管理费 2%（按 AUM）+ 业绩报酬 20%（按收益）','注意题目：业绩费按扣管理费前还是后、有无 hurdle、high-water mark。'],
+ ['pm','CAPM','E(Rᵢ) = R_f + βᵢ[E(R_m) − R_f]','只有系统性风险被定价。SML 上方的股票被低估。'],
+ ['pm','两资产组合方差','σₚ² = w₁²σ₁² + w₂²σ₂² + 2w₁w₂ρσ₁σ₂','ρ < 1 就有分散化好处；ρ = −1 时可以做出零风险组合。'],
+ ['pm','行为偏差分类','Cognitive：信念坚持、信息处理错误；Emotional：损失厌恶、过度自信、禀赋效应等','认知错误可以靠教育纠正；情绪偏差通常只能适应。'],
+ ['ethics','七大 Standards','I 专业性 · II 资本市场诚信 · III 对客户 · IV 对雇主 · V 投资分析与建议 · VI 利益冲突 · VII 会员与考生责任','先记框架，再记每条下面的小条款。'],
+ ['ethics','交易优先级 VI(B)','客户 > 雇主 > 个人','个人交易永远排最后，即使是家人账户也要注意。'],
+ ['ethics','Mosaic theory','公开信息 + 非重要的非公开信息 → 可以得出结论','不违反 II(A)。只要不是 material nonpublic information。'],
+ ['ethics','怎么说自己是考生','“Level II Candidate in the CFA Program”','不能写 “CFA (Level II)”，也不能暗示部分持证或预计何时拿证。']
+].map((c,i)=>({id:'c'+i,t:c[0],q:c[1],f:c[2],tip:c[3]}));
+
+const QS=[
+ ['ethics','一位分析师在私人聚会上从某公司 CFO 那里听到，公司下周将宣布一项尚未公开的收购。根据 Standard II(A)，她应该：',['先发布研究报告，再交易','不依据该信息交易，也不让别人依据它交易','只把信息告诉本公司的基金经理'],1,'这是 material nonpublic information（重大非公开信息）。II(A) 要求不得据此行动，也不得促使他人行动。告诉同事同样违规。'],
+ ['ethics','Standard III(B) Fair Dealing 要求：',['所有客户必须获得完全一样的服务','投资建议和行动要公平地传达给客户，不让任何客户处于不利地位','只能向付费最高的客户先发布建议'],1,'允许不同等级的服务（例如高级账户），但要披露并让所有客户可以选择；关键是不能让一部分客户系统性吃亏。'],
+ ['ethics','一位正在准备二级考试的会员，在简历上最合适的写法是：',['CFA (Level II)','Level II Candidate in the CFA Program','CFA expected 2028'],1,'Standard VII(B)：不能暗示有“部分 CFA 资格”，也不能写预计拿证时间。'],
+ ['ethics','按 Standard VI(B)，交易的优先顺序是：',['雇主 > 客户 > 个人','客户 > 雇主 > 个人','客户 > 个人 > 雇主'],1,'客户利益优先于雇主，二者都优先于本人。个人交易排最后。'],
+ ['ethics','关于 GIPS 合规，下列说法正确的是：',['公司可以声称“部分合规”','GIPS 合规是针对整个公司（firm-wide）的','GIPS 是法律强制要求'],1,'GIPS 是自愿的，但一旦声称合规就必须全公司合规，不允许 partial compliance。'],
+ ['quant','名义年利率 8%，按季度复利，有效年利率 EAR 最接近：',['8.00%','8.24%','8.33%'],1,'EAR = (1 + 0.08/4)^4 − 1 = 1.02^4 − 1 ≈ 8.24%。按月复利会是 8.30%，复利次数越多 EAR 越高。'],
+ ['quant','3 年后收到 1,000 元，年利率 5%（年复利），现值最接近：',['857.14','863.84','870.00'],1,'PV = 1000 / 1.05³ = 1000 / 1.157625 ≈ 863.84。计算器：N=3, I/Y=5, FV=1000, CPT PV。'],
+ ['quant','Type I error 指的是：',['原假设为真时拒绝了原假设','原假设为假时没有拒绝原假设','原假设为假时拒绝了原假设'],0,'Type I = “冤枉好人”，概率就是显著性水平 α。B 是 Type II error，C 是正确决策。'],
+ ['quant','某资产收益均值 10%，标准差 20%，变异系数 CV 为：',['0.5','2.0','0.2'],1,'CV = s / 均值 = 20% / 10% = 2.0。表示每 1 单位收益承担 2 单位风险。'],
+ ['econ','完全竞争市场长期均衡时，企业的经济利润为：',['零','为正','为负'],0,'长期内自由进出使经济利润趋于零（会计利润可以为正）。'],
+ ['econ','扩张性货币政策通常表现为：',['提高政策利率','降低政策利率或增加货币供应','提高存款准备金率'],1,'扩张 = 放松：降息、买入债券（QE）、降准。A 和 C 都是紧缩。'],
+ ['econ','USD/EUR 报价 1.1000（每 1 欧元 1.10 美元）。若欧元对美元升值 5%，新报价为：',['1.0450','1.1550','1.0500'],1,'EUR 是 base currency，base 升值 5% 就把报价乘 1.05：1.10 × 1.05 = 1.1550。'],
+ ['fsa','物价上涨、存货数量稳定时，与 FIFO 相比，LIFO 会导致：',['COGS 更高、期末存货更低','COGS 更低、期末存货更高','COGS 更高、期末存货更高'],0,'LIFO 把最新（最贵）的成本计入 COGS，留下旧的便宜成本在存货里。注意 IFRS 不允许 LIFO。'],
+ ['fsa','按 IFRS，支付的利息可以归类为：',['只能是经营活动','经营活动或筹资活动','只能是投资活动'],1,'IFRS 允许支付利息放在 CFO 或 CFF；US GAAP 要求放在 CFO。'],
+ ['fsa','某公司流动资产 500（其中存货 200，无预付），流动负债 250。速动比率为：',['2.0','1.2','0.8'],1,'Quick ratio = (500 − 200) / 250 = 1.2。2.0 是 current ratio。'],
+ ['fsa','与费用化相比，将一笔支出资本化，在发生当年会使：',['净利润更低','经营活动现金流更高','总现金流更高'],1,'资本化后支出进入 CFI 而不是 CFO，所以 CFO 更高；净利润当年也更高；总现金流不变。'],
+ ['fsa','设备原价 100,000，残值 10,000，使用 5 年，直线法年折旧为：',['20,000','18,000','22,000'],1,'(100,000 − 10,000) / 5 = 18,000。20,000 是忘了减残值。'],
+ ['corp','两个互斥项目的 NPV 和 IRR 排序冲突时，应当依据：',['IRR','NPV','回收期'],1,'NPV 直接衡量股东财富增量，且再投资假设更合理。'],
+ ['corp','债务权重 40%、税前债务成本 6%、税率 25%；权益权重 60%、权益成本 10%。WACC 为：',['7.8%','8.4%','7.2%'],0,'0.4 × 6% × (1 − 0.25) + 0.6 × 10% = 1.8% + 6.0% = 7.8%。8.4% 是忘了税盾。'],
+ ['corp','存货周转天数 45，应收账款天数 30，应付账款天数 40。现金转换周期为：',['35 天','115 天','55 天'],0,'CCC = 45 + 30 − 40 = 35 天。'],
+ ['equity','刚支付的股利 D₀ = 2.00，永续增长 4%，要求回报 9%。股票内在价值为：',['40.00','41.60','23.11'],1,'D₁ = 2 × 1.04 = 2.08；V₀ = 2.08 / (9% − 4%) = 41.60。40.00 是直接用 D₀ 的错误答案。'],
+ ['equity','在半强式有效市场中，下列哪种方法可能持续获得超额收益？',['技术分析','基于公开信息的基本面分析','利用重大非公开信息交易'],2,'半强式有效：价格已反映所有公开信息，只有非公开信息可能带来超额收益（当然这在道德上和法律上都不允许）。'],
+ ['equity','初始保证金 40% 买入股票，股价上涨 10%（不考虑利息和股利），投资者收益率为：',['10%','25%','4%'],1,'杠杆 = 1 / 0.4 = 2.5 倍，收益 = 10% × 2.5 = 25%。'],
+ ['fi','当债券票面利率高于市场收益率时，债券价格：',['高于面值（溢价）','等于面值','低于面值（折价）'],0,'票息比市场要求的更高，投资者愿意多付钱。'],
+ ['fi','修正久期为 7 的债券，收益率上升 50bp，价格变化约为（忽略凸性）：',['−3.5%','−7.0%','−0.35%'],0,'%ΔP ≈ −7 × 0.005 = −3.5%。'],
+ ['fi','2 年期、年付息、票面利率 5% 的债券，面值 100，YTM 4%，价格最接近：',['101.89','98.14','100.00'],0,'5/1.04 + 105/1.04² = 4.808 + 97.078 ≈ 101.89。票息 > YTM，溢价，所以排除 B 和 C。'],
+ ['fi','违约概率 2%，违约损失率 LGD 60%，预期损失为：',['1.2%','0.8%','3.33%'],0,'Expected loss = PD × LGD = 2% × 60% = 1.2%。'],
+ ['fi','与同期限固定利率债券相比，浮动利率债券（FRN）价格对基准利率变化的敏感度：',['更高','更低','相同'],1,'FRN 票息定期重置，久期大约只到下一个重置日，所以利率风险更小。'],
+ ['deriv','股票价格 50，执行价 50，执行价现值 48，欧式看涨期权价格 4。同期限欧式看跌期权价格应为：',['2','6','4'],0,'Put–call parity：P = C + PV(X) − S = 4 + 48 − 50 = 2。'],
+ ['deriv','现货价格 100，无风险利率 5%，标的无收益无成本，1 年期远期价格应为：',['95.24','105.00','100.00'],1,'F₀ = S₀ × (1 + r)^T = 100 × 1.05 = 105。95.24 是把方向弄反了。'],
+ ['deriv','买入看涨期权，执行价 40，期权费 3，到期股价 46。每股利润为：',['6','3','−3'],1,'Payoff = max(0, 46 − 40) = 6，利润 = 6 − 3 = 3。'],
+ ['alt','对冲基金年初 1 亿，年末（费前）1.2 亿。管理费 2% 按年末资产计，业绩报酬 20% 按扣除管理费后的收益计。总费用为：',['640 万','592 万','400 万'],1,'管理费 = 1.2 亿 × 2% = 240 万；业绩报酬 = (2,000 − 240) 万 × 20% = 352 万；合计 592 万。'],
+ ['alt','某物业年净营业收入 NOI 500 万，市场资本化率 6.25%，物业估值为：',['8,000 万','3,125 万','7,500 万'],0,'价值 = NOI / cap rate = 500 / 0.0625 = 8,000 万。'],
+ ['pm','两资产组合：权重 60%/40%，标准差 20%/10%，相关系数 0。组合标准差最接近：',['16.0%','12.65%','14.0%'],1,'σ² = 0.36 × 0.04 + 0.16 × 0.01 = 0.016，σ ≈ 12.65%。16% 是简单加权平均（相当于 ρ = 1）。'],
+ ['pm','无风险利率 3%，β = 1.2，市场预期收益 8%。按 CAPM，预期收益为：',['9.0%','9.6%','12.6%'],0,'3% + 1.2 × (8% − 3%) = 9.0%。9.6% 是 1.2 × 8%，忘了只放大风险溢价。'],
+ ['pm','在 CAPM 框架下，被市场定价（获得风险补偿）的是：',['非系统性风险','系统性风险','总风险'],1,'非系统性风险可以分散掉，所以没有补偿。'],
+ ['pm','损失厌恶（loss aversion）属于：',['认知错误','情绪偏差','信息处理错误'],1,'Loss aversion 是 emotional bias，和过度自信、禀赋效应、自我控制等同类。']
+].map((q,i)=>({id:'q'+i,t:q[0],q:q[1],o:q[2],a:q[3],e:q[4]}));
+
+const SIGNS=['学一点点也算数。今天的 25 分钟，就是考场上的一道题。','累了就去喝口水，花园不会跑，题也不会跑。','FSA 再难，也只是一本一本的报表。你看过的报表比它多。','今天做错的题，都是考试那天不会再错的题。','先完成，再完美。','有人在为你骄傲，从你决定报名那天起。','Ethics 不用急，离考试越近学，记得越牢。','工作已经很辛苦了，今天能翻开书就很棒。'];
+const DEFAULT_REWARDS={10:'一杯你最喜欢的奶茶',50:'一顿你挑的大餐',100:'一束花，再加一个周末不看书',150:'一件你看了很久的小东西',200:'一个说走就走的短途旅行',300:'考完一起去旅行'};
+const MILES=[10,50,100,150,200,300];
+const TARGET_H=300;
+
+/* ============================== STATE ============================== */
+const LS='cfa-garden-v1';
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const mondayOf=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());const k=(x.getDay()+6)%7;return addDays(x,-k)};
+const TODAY=()=>ymd(new Date());
+
+function defaultState(){
+  return {v:1,examDate:'2027-05-19',startDate:ymd(mondayOf(new Date())),weeklyHours:12,
+    conf:Object.fromEntries(TOPICS.map(t=>[t.id,t.conf])),mods:{},sessions:[],cards:{},quiz:{},updatedAt:0};
+}
+function normalize(s){const d=defaultState();const o=Object.assign(d,s||{});o.conf=Object.assign(defaultState().conf,(s&&s.conf)||{});return o}
+let S=normalize((()=>{try{const r=localStorage.getItem(LS);return r?JSON.parse(r):null}catch(e){return null}})());
+
+const cloud={db:null,ref:null,mode:'local',saving:false,dirty:false,timer:null,isOwner:false,notes:[],config:{},sample:null,notesReady:false};
+
+function setSync(mode,text){const e=document.getElementById('sync');e.dataset.s=mode;e.querySelector('span').textContent=text}
+function persist(){
+  S.updatedAt=Date.now();
+  try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}
+  if(cloud.mode!=='cloud')return;
+  cloud.dirty=true;clearTimeout(cloud.timer);cloud.timer=setTimeout(flush,900);
+}
+async function flush(){
+  if(cloud.saving||!cloud.dirty||!cloud.ref)return;
+  cloud.saving=true;cloud.dirty=false;
+  try{await cloud.ref.set(JSON.parse(JSON.stringify(S)));setSync('cloud','已同步')}
+  catch(e){
+    const c=e&&e.code;
+    if(c==='unavailable'){cloud.dirty=true;cloud.saving=false;setTimeout(flush,1500+Math.random()*1500);return}
+    cloud.mode='local';setSync('local','保存在这台设备上');
+  }
+  cloud.saving=false;
+  if(cloud.dirty)flush();
+}
+
+/* ============================== HELPERS ============================== */
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function el(tag,attrs={},...kids){const e=document.createElement(tag);for(const[k,v]of Object.entries(attrs)){if(k==='class')e.className=v;else if(k==='text')e.textContent=v;else if(k==='html')e.innerHTML=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(k==='checked'||k==='disabled'){e[k]=!!v}else if(v!==false&&v!=null)e.setAttribute(k,v===true?'':v)}for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(c))}return e}
+const minutesBy=()=>{const m={};for(const s of S.sessions){m[s.d]=(m[s.d]||0)+s.m}return m};
+const totalH=()=>S.sessions.reduce((a,s)=>a+s.m,0)/60;
+function streak(){const m=minutesBy();let d=new Date();if(!m[ymd(d)])d=addDays(d,-1);let n=0;while(m[ymd(d)]){n++;d=addDays(d,-1)}return n}
+function daysLeft(){const a=parse(TODAY()),b=parse(S.examDate);return Math.round((b-a)/864e5)}
+const modsDone=id=>(S.mods[id]||[]).length;
+function herName(){return String(cloud.config.herName||'').trim()}
+function greet(){const h=new Date().getHours();const g=h<5?'这么晚还在学':h<11?'早上好':h<14?'中午好':h<18?'下午好':'晚上好';const n=herName();return n?g+'，'+n:g+'呀'}
+function petals(x,y){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  for(let i=0;i<14;i++){const p=document.createElement('div');p.className='petal';p.style.left=x+'px';p.style.top=y+'px';
+    if(i%3===1)p.style.background='var(--gold)';if(i%3===2)p.style.background='var(--leaf)';
+    document.body.append(p);const a=Math.random()*Math.PI*2,r=60+Math.random()*90;
+    p.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r+60}px) rotate(${Math.random()*540}deg)`,opacity:0}],{duration:1100+Math.random()*600,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>p.remove()}
+}
+const STAR='<svg viewBox="-10 -10 20 20" aria-hidden="true"><path d="M0 -7 L2 -2 L7.5 -2 L3 1.3 L4.7 6.6 L0 3.4 L-4.7 6.6 L-3 1.3 L-7.5 -2 L-2 -2Z" fill="var(--gold)"/></svg>';
+function flower(level){
+  if(!level)return '<span class="soil"></span>';
+  if(level===1)return '<svg viewBox="-10 -10 20 20" aria-hidden="true"><path d="M0 8 V1" stroke="var(--leaf)" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M0 5 C-4 5 -5 2 -5 1 C-2 1 0 3 0 5Z" fill="var(--leaf)"/><ellipse cx="0" cy="-1" rx="2.6" ry="3.6" fill="var(--rose)"/></svg>';
+  const r=level===2?3.6:4.8,pr=level===2?2.9:3.7,n=level===2?5:6;let s='';
+  for(let i=0;i<n;i++){const a=i/n*Math.PI*2-Math.PI/2;s+=`<circle cx="${(Math.cos(a)*r).toFixed(2)}" cy="${(Math.sin(a)*r).toFixed(2)}" r="${pr}" fill="var(--rose)" opacity="${level===3&&i%2?'.78':'1'}"/>`}
+  return `<svg viewBox="-10 -10 20 20" aria-hidden="true">${s}<circle r="${level===2?2.2:2.8}" fill="var(--gold)"/></svg>`;
+}
+const lvl=m=>!m?0:m<30?1:m<90?2:3;
+const fmtDate=ts=>{const d=new Date(ts);return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`};
+
+/* ============================== PLAN ============================== */
+function buildPlan(){
+  const start=mondayOf(parse(S.startDate)),exam=parse(S.examDate);
+  const weeks=Math.max(1,Math.ceil((exam-start+864e5)/(7*864e5)));
+  const factor={1:1.3,2:1,3:.7};
+  const raw=ORDER.map(id=>{const t=T[id];return{id,v:(t.w[0]+t.w[1])/2*factor[S.conf[id]||2]}});
+  const sum=raw.reduce((a,r)=>a+r.v,0);
+  const NEED=TARGET_H*.8;
+  const reviewMin=weeks>=14?Math.max(4,Math.round(weeks*.22)):Math.max(1,Math.round(weeks*.25));
+  const passW=Math.max(1,weeks-reviewMin);
+  const cap=passW*S.weeklyHours;
+  const scale=Math.min(1,cap/NEED);
+  const blocks=raw.map(r=>({id:r.id,h:NEED*r.v/sum*scale}));
+  const out=[];let bi=0,left=blocks[0].h;
+  for(let w=0;w<weeks;w++){
+    const ws=addDays(start,w*7);const item={i:w,start:ws,items:[],phase:'first'};
+    if(bi<blocks.length){
+      let capW=S.weeklyHours;
+      while(capW>.05&&bi<blocks.length){const take=Math.min(capW,left);if(take>.05)item.items.push({id:blocks[bi].id,h:take});capW-=take;left-=take;if(left<=.05){bi++;if(bi<blocks.length)left=blocks[bi].h}}
+      out.push(item);continue;
+    }
+    item.phase=(weeks-w<=2)?'mock':'review';out.push(item);
+  }
+  const rv=ORDER.slice().sort((a,b)=>(T[b].w[1]*(4-(S.conf[b]||2)))-(T[a].w[1]*(4-(S.conf[a]||2))));
+  let k=0;out.filter(x=>x.phase==='review').forEach(x=>{x.items=[{id:rv[k%rv.length]},{id:rv[(k+1)%rv.length]}];k+=2});
+  return{weeks:out,total:weeks,firstWeeks:out.filter(x=>x.phase==='first').length,scale,cap,need:NEED};
+}
+function currentWeek(plan){const t=parse(TODAY());return plan.weeks.find(w=>t>=w.start&&t<addDays(w.start,7))}
+
+/* ============================== VIEWS ============================== */
+const views={};
+let view='today';
+let lastPop=null;
+
+views.today=()=>{
+  const plan=buildPlan(),cw=currentWeek(plan),dl=daysLeft();
+  const s=el('section',{class:'view'});
+  const hrs=totalH();
+  const exam=parse(S.examDate);
+  const hero=el('div',{class:'hero'});
+  const count=el('div',{class:'count'},
+    el('div',{class:'greet',text:greet()}),
+    el('div',{class:'big'},el('b',{class:'num',text:dl>=0?String(dl):'✓'}),el('span',{text:dl>=0?'天':'考完啦'})),
+    el('div',{class:'sub',text:dl>=0?`距离 CFA Level I 考试 · ${exam.getFullYear()} 年 ${exam.getMonth()+1} 月 ${exam.getDate()} 日`:'辛苦了，等成绩的日子也要好好吃饭。'}),
+    el('div',{class:'stats'},
+      el('div',{class:'stat'},el('b',{class:'num',text:hrs.toFixed(hrs<10?1:0)}),el('small',{text:`已学习小时 / 目标 ${TARGET_H}`}),el('div',{class:'hbar',html:`<i style="width:${Math.min(100,hrs/TARGET_H*100).toFixed(1)}%"></i>`})),
+      el('div',{class:'stat'},el('b',{class:'num',text:String(streak())}),el('small',{text:'连续打卡天数'})),
+      el('div',{class:'stat'},el('b',{class:'num',text:String(Object.values(S.mods).reduce((a,v)=>a+v.length,0))}),el('small',{text:'/ '+TOPICS.reduce((a,t)=>a+t.mods.length,0)+' 个模块已学完'}))
+    ));
+  hero.append(count,noteCard());
+  s.append(hero);
+
+  const two=el('div',{class:'two'});
+  const fp=el('div',{class:'panel'});
+  if(cw&&cw.phase==='first'&&cw.items.length){
+    const main=cw.items.reduce((a,b)=>a.h>b.h?a:b);const t=T[main.id];
+    fp.append(el('div',{class:'eyebrow',text:`这周的重点 · 第 ${cw.i+1} / ${plan.total} 周`}),
+      el('div',{class:'focus-t',html:`${esc(t.cn)} <span class="en">${esc(t.en)}</span>`}),
+      el('div',{class:'muted',text:cw.items.map(x=>`${T[x.id].cn} 约 ${Math.round(x.h)} 小时`).join(' · ')}));
+    const ul=el('ul',{class:'mods'});
+    const done=S.mods[t.id]||[];const next=t.mods.map((m,i)=>({m,i})).filter(x=>!done.includes(x.i)).slice(0,4);
+    if(!next.length)ul.append(el('li',{class:'muted',text:'这一科的模块都勾完了，去做几道练习题巩固一下吧。'}));
+    next.forEach(x=>ul.append(modItem(t.id,x.i,x.m)));
+    fp.append(ul,el('a',{href:'#map',style:'font-size:13px;display:inline-block;margin-top:8px',text:'在知识地图里看全部模块 →'}));
+  }else if(cw){
+    fp.append(el('div',{class:'eyebrow',text:cw.phase==='mock'?'冲刺周':'复习周 · 第 '+(cw.i+1)+' / '+plan.total+' 周'}),
+      el('div',{class:'focus-t',text:cw.phase==='mock'?'模考 + 错题复盘':'第二轮复习'}),
+      el('p',{class:'muted',text:cw.phase==='mock'?'这周做一套完整模考（两场各 2 小时 15 分钟），按考场时间来。剩下的时间只看错题和公式卡，早点睡。':'重点复习：'+cw.items.map(x=>T[x.id].cn).join('、')+'。每天刷一组练习题，错题第二天再做一遍。'}));
+  }else{
+    fp.append(el('div',{class:'eyebrow',text:'计划'}),el('p',{text:'今天不在计划的日期范围里，去「学习计划」看看起止日期。'}));
+  }
+  two.append(fp);
+
+  const lp=el('div',{class:'panel'});
+  lp.append(el('div',{class:'eyebrow',text:'记一笔 · 种一朵花'}));
+  const sel=el('select',{id:'logTopic','aria-label':'科目'},ORDER.map(id=>el('option',{value:id,text:T[id].cn})));
+  if(cw&&cw.phase==='first'&&cw.items[0])sel.value=cw.items.reduce((a,b)=>a.h>b.h?a:b).id;
+  const min=el('input',{type:'number',id:'logMin',min:5,max:600,step:5,value:45,style:'width:90px','aria-label':'分钟'});
+  const chips=el('div',{class:'logrow'},[25,45,60,90,120].map(v=>el('button',{class:'chip',type:'button',onclick:()=>{min.value=v}},v+' 分钟')));
+  const ok=el('div',{class:'log-ok',id:'logOk'});
+  const btn=el('button',{class:'btn primary',type:'button',onclick:(ev)=>{
+    const m=Math.round(+min.value);if(!(m>0&&m<=600)){ok.textContent='分钟数填 5 到 600 之间。';return}
+    const before=totalH();
+    S.sessions.push({d:TODAY(),m,t:sel.value});persist();
+    const r=ev.currentTarget.getBoundingClientRect();petals(r.left+r.width/2,r.top);
+    const after=totalH();const hit=MILES.find(x=>before<x&&after>=x);
+    lastPop=TODAY();render();
+    const o=$('#logOk');if(o)o.textContent=hit?`达成 ${hit} 小时里程碑！奖励：${rewardFor(hit)}`:`记下了 ${m} 分钟，花园里多了一朵花。`;
+  }},'种下今天');
+  const todayM=minutesBy()[TODAY()]||0;
+  lp.append(el('p',{class:'muted',style:'margin:6px 0 12px',text:'学完一段就记下来。每天的时间会长成花园里的一朵花，学得越久花越大。'}),
+    el('div',{class:'logrow'},sel,min,el('span',{class:'muted',text:'分钟'})),el('div',{style:'height:10px'}),chips,el('div',{style:'height:14px'}),
+    el('div',{class:'logrow'},btn,todayM?el('span',{class:'muted',style:'font-size:13px',text:`今天已经学了 ${todayM} 分钟`}):null),ok);
+  two.append(lp);
+  s.append(two);
+
+  const side=el('div',{class:'garden-side'});
+  side.append(gardenSection());
+  const ms=el('div');
+  ms.append(el('div',{class:'sec-h'},el('h2',{text:'里程碑'}),el('p',{class:'muted',text:'官方建议每一级准备约 300 小时。每一段路都有一个小奖励。'})));
+  const list=el('div',{class:'miles'});
+  MILES.forEach(x=>{const got=hrs>=x;list.append(el('div',{class:'mile'+(got?' got':'')},el('b',{class:'num',text:x+'h'}),el('div',{text:rewardFor(x)}),el('div',{class:'st',text:got?'已解锁':`还差 ${Math.ceil(x-hrs)} 小时`})))});
+  ms.append(list);side.append(ms);
+  s.append(side);
+  return s;
+};
+function rewardFor(h){const r=cloud.config.rewards||{};return (r[h]&&String(r[h]).trim())||DEFAULT_REWARDS[h]}
+
+function gardenSection(){
+  const wrap=el('div');
+  const start=mondayOf(parse(S.startDate)),exam=parse(S.examDate);
+  const m=minutesBy();const today=TODAY();
+  wrap.append(el('div',{class:'sec-h'},el('h2',{text:'学习花园'}),el('p',{class:'muted',text:'每一格是一天，一直排到考试那天。'})));
+  const g=el('div',{class:'garden',role:'img','aria-label':'每日学习时间日历'});
+  g.append(el('div'));['一','二','三','四','五','六','日'].forEach(d=>g.append(el('div',{class:'dow',text:d})));
+  let lastMonth=-1;
+  for(let w=0;w<60;w++){
+    const ws=addDays(start,w*7);
+    if(ws>exam)break;
+    const mo=ws.getMonth();
+    g.append(el('div',{class:'mon',text:mo!==lastMonth?`${(w===0||mo===0)?ws.getFullYear()+'.':''}${mo+1}月`:''}));lastMonth=mo;
+    for(let d=0;d<7;d++){
+      const day=addDays(ws,d),k=ymd(day),mins=m[k]||0;
+      let cls='cell';if(k>today)cls+=' future';if(k===today)cls+=' today';if(k===S.examDate)cls+=' exam';if(k===lastPop&&k===today)cls+=' pop';
+      const c=el('div',{class:cls,title:`${day.getMonth()+1}月${day.getDate()}日${mins?' · '+mins+' 分钟':''}${k===S.examDate?' · 考试日':''}`});
+      c.innerHTML=k===S.examDate?STAR:flower(lvl(mins));
+      g.append(c);
+    }
+  }
+  lastPop=null;
+  const gw=el('div',{class:'garden-wrap'});gw.append(g);wrap.append(gw);
+  wrap.append(el('div',{class:'garden-legend',html:`<span>${flower(1)}少于 30 分钟</span><span>${flower(2)}30–90 分钟</span><span>${flower(3)}90 分钟以上</span><span>${STAR}考试日</span>`}));
+  return wrap;
+}
+function modItem(tid,i,name){
+  const done=(S.mods[tid]||[]).includes(i);
+  const li=el('li',{class:done?'done':''});
+  const id=`m-${tid}-${i}`;
+  const cb=el('input',{type:'checkbox',id,checked:done,onchange:(ev)=>{
+    const arr=S.mods[tid]||(S.mods[tid]=[]);
+    if(ev.target.checked){if(!arr.includes(i))arr.push(i);const r=ev.target.getBoundingClientRect();petals(r.left,r.top)}
+    else S.mods[tid]=arr.filter(x=>x!==i);
+    persist();render();
+  }});
+  li.append(el('label',{for:id},cb,el('span',{},el('span',{class:'num muted',text:'LM '+(i+1)+' · '}),name)));
+  return li;
+}
+function noteCard(){
+  const notes=cloud.notes;
+  const card=el('div',{class:'note'});
+  if(notes.length){
+    const n=notes[0];
+    card.append(el('div',{class:'from',text:'他留给你的话'}),el('div',{class:'txt',text:n.text}),
+      el('div',{class:'meta'},el('span',{text:fmtDate(n.at)}),notes.length>1?el('a',{href:'#notes',text:`还有 ${notes.length-1} 张 →`}):el('span',{class:'heart',text:'♥'})));
+  }else{
+    const i=Math.floor(parse(TODAY())/864e5)%SIGNS.length;
+    card.append(el('div',{class:'from',text:'今日小签'}),el('div',{class:'txt',text:SIGNS[i]}),
+      el('div',{class:'meta'},el('span',{text:cloud.isOwner?'在「他的留言」里写一句给她，这里就会换成你的话。':'每天换一张'}),el('span',{class:'heart',text:'♥'})));
+  }
+  return card;
+}
+
+views.plan=()=>{
+  const s=el('section',{class:'view'});
+  const plan=buildPlan();const cw=currentWeek(plan);
+  const top=el('div');
+  top.append(el('div',{class:'sec-h'},el('h2',{text:'学习计划'}),el('p',{class:'muted',text:'按考试日期、每周时间和各科熟悉程度自动排好，改任何一项都会立刻重排。'})));
+  const exam=el('input',{type:'date',id:'examDate',value:S.examDate,onchange:e=>{if(e.target.value&&e.target.value>S.startDate){S.examDate=e.target.value;persist();render()}}});
+  const startI=el('input',{type:'date',id:'startDate',value:S.startDate,onchange:e=>{if(e.target.value&&e.target.value<S.examDate){S.startDate=e.target.value;persist();render()}}});
+  const hv=el('b',{class:'num',text:S.weeklyHours+' 小时'});
+  const hr=el('input',{type:'range',id:'weeklyHours',min:5,max:30,step:1,value:S.weeklyHours,style:'width:180px;accent-color:var(--rose)',oninput:e=>{hv.textContent=e.target.value+' 小时'},onchange:e=>{S.weeklyHours=+e.target.value;persist();render()}});
+  top.append(el('div',{class:'plan-set'},
+    el('label',{class:'f',for:'examDate'},'考试日期',exam),
+    el('label',{class:'f',for:'startDate'},'开始日期',startI),
+    el('label',{class:'f',for:'weeklyHours'},el('span',{},'每周学习时间 ',hv),hr)));
+  top.append(el('p',{class:'muted',style:'font-size:13px;margin:10px 0 0;max-width:72ch',text:'Level I 每年有 2 月、5 月、8 月、11 月四个考试窗口，默认按 2027 年 5 月排。约好考位后把日期改成准确的那一天。'}));
+  top.append(el('div',{class:'plan-sum'},
+    el('div',{class:'stat'},el('b',{class:'num',text:String(plan.total)}),el('small',{text:'周 · 总共'})),
+    el('div',{class:'stat'},el('b',{class:'num',text:String(plan.firstWeeks)}),el('small',{text:'周 · 第一轮学新课'})),
+    el('div',{class:'stat'},el('b',{class:'num',text:String(plan.total-plan.firstWeeks)}),el('small',{text:'周 · 复习与模考'})),
+    el('div',{class:'stat'},el('b',{class:'num',text:String(Math.round(plan.total*S.weeklyHours))}),el('small',{text:'小时 · 可用总时间'}))));
+  if(plan.scale<.999||plan.total*S.weeklyHours<TARGET_H*.85){
+    top.append(el('div',{class:'warn',text:`按每周 ${S.weeklyHours} 小时，到考试总共约 ${Math.round(plan.total*S.weeklyHours)} 小时，比建议的 ${TARGET_H} 小时少。可以把每周时间往上调一点，或者选晚一个考试窗口。你的经济学和工作背景能省下一部分时间，差得不多也没关系。`}));
+  }
+  s.append(top);
+
+  const bk=el('div');
+  bk.append(el('div',{class:'sec-h'},el('h3',{text:'备份进度'}),el('p',{class:'muted',text:'进度只存在这台设备的浏览器里。隔一阵子备份一次；换手机或电脑时，在新设备上恢复就行。'})));
+  const bmsg=el('span',{class:'muted',style:'font-size:13px'});
+  const file=el('input',{type:'file',id:'restoreFile',accept:'application/json,.json',hidden:true,onchange:e=>{
+    const f=e.target.files&&e.target.files[0];if(!f)return;
+    const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!Array.isArray(d.sessions))throw 0;S=normalize(d);persist();render();const m=$('#bmsg');if(m)m.textContent='恢复好了。'}catch(err){bmsg.textContent='这个文件不是小花园的备份。'}};r.readAsText(f);
+  }});
+  bk.append(el('div',{class:'logrow'},
+    el('button',{class:'btn',type:'button',onclick:()=>{const b=new Blob([JSON.stringify(S)],{type:'application/json'});const a=el('a',{href:URL.createObjectURL(b),download:'cfa-garden-'+TODAY()+'.json'});document.body.append(a);a.click();a.remove();bmsg.textContent='备份文件已下载。'}},'下载备份'),
+    el('button',{class:'btn',type:'button',onclick:()=>file.click()},'从备份恢复'),file,Object.assign(bmsg,{id:'bmsg'})));
+  s.append(bk);
+
+  const wk=el('div');
+  wk.append(el('div',{class:'sec-h'},el('h3',{text:'每周安排'}),el('p',{class:'muted',text:'先用数量方法热身，然后啃 FSA；Ethics 放在第一轮最后，离考试最近。'})));
+  const list=el('div',{class:'weeks'});
+  const t=parse(TODAY());
+  plan.weeks.forEach(w=>{
+    const end=addDays(w.start,6);
+    const isNow=cw&&cw.i===w.i,past=end<t;
+    const row=el('div',{class:'week'+(isNow?' now':'')+(past?' past':'')});
+    row.append(el('div',{class:'wk'},el('b',{text:'第 '+(w.i+1)+' 周'}),`${w.start.getMonth()+1}/${w.start.getDate()}–${end.getMonth()+1}/${end.getDate()}`));
+    const body=el('div');
+    if(w.phase==='first'){body.append(el('span',{class:'phase',text:'新课'}));w.items.forEach(x=>body.append(el('span',{class:'tag',text:`${T[x.id].cn} ${Math.round(x.h*10)/10}h`})))}
+    else if(w.phase==='review'){body.append(el('span',{class:'phase rv',text:'复习'}),el('span',{text:'重点：'+w.items.map(x=>T[x.id].cn).join('、')+' · 每天一组练习题 + 错题重做'}))}
+    else{body.append(el('span',{class:'phase mk',text:'冲刺'}),el('span',{text:(plan.total-w.i===2)?'完整模考一套（2 场 × 2 小时 15 分钟） · 逐题复盘':'第二套模考 · Ethics 冲刺 · 公式卡过一遍 · 调整作息'}))}
+    if(isNow)body.append(el('div',{class:'muted',style:'font-size:12px;margin-top:2px',text:'← 你在这里'}));
+    row.append(body,el('div',{class:'hrs',text:S.weeklyHours+'h'}));
+    list.append(row);
+  });
+  wk.append(list);s.append(wk);
+  return s;
+};
+
+const openTopics=new Set();
+views.map=()=>{
+  const s=el('section',{class:'view'});
+  const head=el('div');
+  const totalMods=TOPICS.reduce((a,t)=>a+t.mods.length,0),done=Object.values(S.mods).reduce((a,v)=>a+v.length,0);
+  head.append(el('div',{class:'sec-h'},el('h2',{text:'知识地图'}),el('p',{class:'muted',text:`已完成 ${done} / ${totalMods} 个模块`})));
+  head.append(el('p',{class:'muted',style:'margin:0;max-width:72ch',text:'十个科目，按建议的学习顺序排列。金色条是考试权重，绿色条是你勾完的模块。Level I 共 180 道选择题，分两场，每场 2 小时 15 分钟。'}));
+  s.append(head);
+  const box=el('div');
+  ORDER.forEach(id=>{
+    const t=T[id];const d=modsDone(id);const open=openTopics.has(id);
+    const row=el('div',{class:'topic'+(open?' open':'')});
+    row.append(el('button',{class:'t-head',type:'button','aria-expanded':open?'true':'false',onclick:()=>{open?openTopics.delete(id):openTopics.add(id);render()}},
+      el('div',{class:'t-name',html:`${esc(t.cn)}<span class="en">${esc(t.en)}</span>`}),
+      el('div',{class:'wbar',html:`权重 ${t.w[0]}–${t.w[1]}%<div class="w"><i style="left:${t.w[0]/20*100}%;width:${(t.w[1]-t.w[0])/20*100}%"></i></div>`}),
+      el('div',{class:'pbar',html:`${d} / ${t.mods.length} 模块<div class="p"><i style="width:${d/t.mods.length*100}%"></i></div>`}),
+      el('div',{class:'caret',html:'›'})));
+    const body=el('div',{class:'t-body'});
+    body.append(el('div',{class:'why',html:t.why}));
+    body.append(el('div',{class:'conf'},'我对这科：',[[1,'还生疏'],[2,'还行'],[3,'很熟']].map(([v,l])=>el('button',{class:'chip',type:'button','aria-pressed':(S.conf[id]||2)===v?'true':'false',onclick:()=>{S.conf[id]=v;persist();render()}},l)),el('span',{style:'font-size:12px',text:'会影响学习计划给这科分多少时间'})));
+    const ul=el('ul',{class:'mods cols'});t.mods.forEach((m,i)=>ul.append(modItem(id,i,m)));
+    body.append(ul);
+    row.append(body);box.append(row);
+  });
+  s.append(box);
+  return s;
+};
+
+/* flashcards */
+const fc={topic:'all',queue:null,flipped:false,doneToday:0};
+const INTERVAL=[0,1,2,4,8,16];
+function dueCards(topic){const t=TODAY();return CARDS.filter(c=>(topic==='all'||c.t===topic)&&(!S.cards[c.id]||S.cards[c.id].due<=t))}
+views.cards=()=>{
+  const s=el('section',{class:'view'});
+  if(!fc.queue)fc.queue=dueCards(fc.topic).map(c=>c.id);
+  const head=el('div');
+  head.append(el('div',{class:'sec-h'},el('h2',{text:'公式闪卡'}),el('p',{class:'muted',text:'记住了的卡片会隔 1、2、4、8、16 天再出现；没记住的明天再来。'})));
+  const bar=el('div',{class:'fc-bar'});
+  [['all','全部']].concat(ORDER.filter(id=>CARDS.some(c=>c.t===id)).map(id=>[id,T[id].cn])).forEach(([v,l])=>{
+    const n=dueCards(v).length;
+    bar.append(el('button',{class:'chip',type:'button','aria-pressed':fc.topic===v?'true':'false',onclick:()=>{fc.topic=v;fc.queue=null;fc.flipped=false;render()}},`${l} ${n}`))});
+  head.append(bar);s.append(head);
+  const area=el('div');
+  const id=fc.queue[0];
+  if(!id){
+    area.append(el('div',{class:'empty'},el('h3',{text:fc.doneToday?`今天复习了 ${fc.doneToday} 张，这一组全部完成`:'这一组今天没有要复习的卡片'}),el('p',{text:'可以换个科目，或者去做几道练习题。'}),
+      el('button',{class:'btn',type:'button',onclick:()=>{fc.queue=CARDS.filter(c=>fc.topic==='all'||c.t===fc.topic).map(c=>c.id).sort(()=>Math.random()-.5);fc.flipped=false;render()}},'不管进度，再全部过一遍')));
+  }else{
+    const c=CARDS.find(x=>x.id===id);
+    const fl=el('div',{class:'flash'+(fc.flipped?' flipped':'')});
+    let acts;
+    const inn=el('div',{class:'flash-in',role:'button',tabindex:'0','aria-label':'翻面',onclick:()=>{fc.flipped=!fc.flipped;fl.classList.toggle('flipped',fc.flipped);acts.hidden=!fc.flipped},onkeydown:e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();e.currentTarget.click()}}},
+      el('div',{class:'face'},el('div',{class:'ttag',text:T[c.t].cn+' · '+T[c.t].en}),el('div',{class:'q',text:c.q}),el('div',{class:'hint',text:'先在心里说出来，再点一下翻面'})),
+      el('div',{class:'face back'},el('div',{class:'ttag',text:c.q}),el('div',{class:'fx',text:c.f}),el('div',{class:'tip',text:c.tip}),el('div',{class:'hint',text:`这一组还剩 ${fc.queue.length} 张`})));
+    fl.append(inn);
+    const grade=(know)=>{
+      const cur=S.cards[c.id]||{box:0};const box=know?Math.min(5,cur.box+1):1;
+      S.cards[c.id]={box,due:ymd(addDays(new Date(),know?INTERVAL[box]:1))};
+      fc.queue.shift();fc.flipped=false;fc.doneToday++;persist();render();
+    };
+    acts=el('div',{class:'fc-act'},el('button',{class:'btn',type:'button',onclick:()=>grade(false)},'再看看'),el('button',{class:'btn primary',type:'button',onclick:()=>grade(true)},'记住了'));
+    acts.hidden=!fc.flipped;
+    area.append(fl,acts);
+  }
+  const counts=[0,0,0,0,0,0];CARDS.forEach(c=>{counts[(S.cards[c.id]||{box:0}).box]++});
+  area.append(el('div',{class:'boxes'},counts.map((n,i)=>el('span',{class:'num',text:(i===0?'没学过 ':'熟练度 '+i+' · ')+n}))));
+  s.append(area);
+  return s;
+};
+
+/* quiz */
+const qz={topic:'all',set:null,i:0,picked:null,score:0};
+function startQuiz(){
+  const pool=QS.filter(q=>qz.topic==='all'||q.t===qz.topic);
+  const pri=q=>{const r=S.quiz[q.id];return !r?1:r.ok?2:0}; // wrong first, then unseen, then correct
+  qz.set=pool.map(q=>({q,k:pri(q)+Math.random()*.9})).sort((a,b)=>a.k-b.k).slice(0,10).map(x=>x.q.id);
+  qz.i=0;qz.picked=null;qz.score=0;
+}
+views.quiz=()=>{
+  const s=el('section',{class:'view'});
+  const head=el('div');
+  head.append(el('div',{class:'sec-h'},el('h2',{text:'练习题'}),el('p',{class:'muted',text:`${QS.length} 道原创练习题，每组最多 10 道，做错的会优先再出现。和考试一样是 A / B / C 三选一。`})));
+  const bar=el('div',{class:'fc-bar'});
+  [['all','全部']].concat(ORDER.map(id=>[id,T[id].cn])).forEach(([v,l])=>bar.append(el('button',{class:'chip',type:'button','aria-pressed':qz.topic===v?'true':'false',onclick:()=>{qz.topic=v;qz.set=null;render()}},l)));
+  head.append(bar);s.append(head);
+
+  const area=el('div',{class:'qcard'});
+  if(!qz.set){
+    area.append(el('div',{},el('h3',{style:'font-size:20px',text:qz.topic==='all'?'混合一组':`${T[qz.topic].cn} 专项`}),el('p',{class:'muted',text:'不限时，做完一道立刻看解析。建议拿 BA II Plus 计算器算一遍。'}),el('button',{class:'btn primary',type:'button',onclick:()=>{startQuiz();render()}},'开始一组')));
+  }else if(qz.i>=qz.set.length){
+    const n=qz.set.length;
+    area.append(el('div',{class:'eyebrow',text:'这一组做完了'}),el('div',{class:'result-big num',text:`${qz.score}/${n}`}),
+      el('p',{text:qz.score/n>=.7?'超过 70%，保持这个状态。':'错题已经记下了，下一组会优先出现。今天错过的，考场上就不会再错。'}),
+      el('div',{class:'qnav'},el('button',{class:'btn primary',type:'button',onclick:()=>{startQuiz();render()}},'再来一组'),el('button',{class:'btn',type:'button',onclick:()=>{qz.set=null;render()}},'换个科目')));
+  }else{
+    const q=QS.find(x=>x.id===qz.set[qz.i]);
+    area.append(el('div',{class:'qmeta'},el('span',{text:`第 ${qz.i+1} / ${qz.set.length} 题 · ${T[q.t].cn}`}),el('span',{class:'num',text:`本组答对 ${qz.score}`})));
+    area.append(el('p',{class:'qtext',text:q.q}));
+    const opts=el('div',{class:'opts'});
+    q.o.forEach((o,i)=>{
+      let cls='opt';if(qz.picked!=null){if(i===q.a)cls+=' right';else if(i===qz.picked)cls+=' wrong'}
+      opts.append(el('button',{class:cls,type:'button',disabled:qz.picked!=null,onclick:(ev)=>{
+        qz.picked=i;const ok=i===q.a;if(ok){qz.score++;const r=ev.currentTarget.getBoundingClientRect();petals(r.left+30,r.top)}
+        const prev=S.quiz[q.id]||{n:0,c:0};S.quiz[q.id]={n:prev.n+1,c:prev.c+(ok?1:0),ok};persist();render();
+      }},el('b',{text:'ABC'[i]}),el('span',{text:o})));
+    });
+    area.append(opts);
+    if(qz.picked!=null){
+      const ok=qz.picked===q.a;
+      area.append(el('div',{class:'explain'+(ok?'':' bad')},el('p',{},el('b',{text:ok?'答对了。':'正确答案是 '+'ABC'[q.a]+'。'})),el('p',{text:q.e})));
+      const nav=el('div',{class:'qnav'},el('button',{class:'btn primary',type:'button',onclick:()=>{qz.i++;qz.picked=null;render()}},qz.i+1<qz.set.length?'下一题':'看结果'));
+      if(cloud.sample){nav.append(el('button',{class:'btn',type:'button',onclick:()=>{
+        tutor.pending=`我在做这道 CFA 一级练习题：\n${q.q}\nA. ${q.o[0]}\nB. ${q.o[1]}\nC. ${q.o[2]}\n正确答案是 ${'ABC'[q.a]}，我选了 ${'ABC'[qz.picked]}。请换个角度帮我讲一遍，并告诉我考试里这个知识点常见的陷阱。`;
+        location.hash='tutor';
+      }},'让助教再讲一遍'))}
+      area.append(nav);
+    }
+  }
+  s.append(area);
+
+  const acc=el('div');
+  acc.append(el('div',{class:'sec-h'},el('h3',{text:'各科正确率'}),el('p',{class:'muted',text:'按每道题最近一次的作答计算。'})));
+  const g=el('div',{class:'acc'});
+  ORDER.forEach(id=>{const qs=QS.filter(q=>q.t===id);const seen=qs.filter(q=>S.quiz[q.id]);const ok=seen.filter(q=>S.quiz[q.id].ok).length;
+    g.append(el('div',{},el('span',{},T[id].cn+' ',el('span',{class:'muted num',text:seen.length?`${ok}/${seen.length}`:`未做 · ${qs.length} 题`})),el('div',{class:'p',html:`<i style="width:${seen.length?ok/seen.length*100:0}%"></i>`})))});
+  acc.append(g);s.append(acc);
+  return s;
+};
+
+/* tutor */
+const tutor={msgs:[],busy:false,pending:null,ctrl:null};
+const TUTOR_SYS='你是一位 CFA Level I 私人助教。学生背景：经济学本科、金融相关硕士，在保险公司做海外投资，一边工作一边备考。\n要求：用中文讲解，关键术语保留英文（如 duration、NPV、MNPI）；先讲直觉，再给公式或计算步骤，最后用一句话说明考试里通常怎么考、有什么陷阱；能结合保险资金或海外投资的例子时就结合；回答尽量在 350 字以内，语气温和、鼓励；不确定的地方直接说明，不要编造官方原题或具体考试日期。不要使用 Markdown 标题和表格，用简单的分行和编号。\n\n学生的问题：\n';
+views.tutor=()=>{
+  const s=el('section',{class:'view'});
+  s.append(el('div',{class:'sec-h'},el('h2',{text:'问助教'}),el('p',{class:'muted',text:'哪里没懂就问。助教知道你的背景，用中文讲，保留英文术语。'})));
+  if(!cloud.sample){s.append(el('p',{class:'muted',text:'这个打开方式下助教用不了。'}));return s}
+  const chat=el('div',{class:'chat',id:'chat'});
+  if(!tutor.msgs.length)chat.append(el('div',{class:'msg ai',text:'你好呀。可以问我任何一个 CFA 一级的知识点，或者把不会的题贴过来。下面有几个可以直接点的问题。'}));
+  tutor.msgs.forEach(m=>chat.append(el('div',{class:'msg '+(m.role==='user'?'me':m.err?'err':'ai'),text:m.content})));
+  s.append(chat);
+  const presets=['用保险资金配置的例子解释 duration 和 convexity','FIFO 和 LIFO 对三张报表的影响分别是什么','Standard I 到 VII 怎么记最快？','put–call parity 为什么成立？用复制的思路讲','给我出 3 道 FSA 的练习题，先不要给答案'];
+  s.append(el('div',{class:'presets'},presets.map(p=>el('button',{class:'chip',type:'button',disabled:tutor.busy,onclick:()=>askTutor(p)},p))));
+  const ta=el('textarea',{id:'tutorInput',placeholder:'比如：为什么浮动利率债券的久期很短？（⌘ + Enter 发送）',onkeydown:e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();send()}}});
+  const send=()=>{const v=ta.value.trim();if(v){ta.value='';askTutor(v)}};
+  s.append(el('div',{class:'ask'},ta,tutor.busy?el('button',{class:'btn',type:'button',onclick:()=>tutor.ctrl&&tutor.ctrl.abort()},'停止'):el('button',{class:'btn primary',type:'button',onclick:send},'发送')));
+  if(tutor.pending){const p=tutor.pending;tutor.pending=null;setTimeout(()=>askTutor(p),0)}
+  return s;
+};
+async function askTutor(text){
+  if(tutor.busy||!cloud.sample)return;
+  tutor.msgs.push({role:'user',content:text});
+  const ai={role:'assistant',content:'正在想…'};
+  const hist=tutor.msgs.filter(m=>!m.err).slice(-9).map(m=>({role:m.role,content:m.content}));
+  while(hist.length&&hist[0].role!=='user')hist.shift();
+  hist[0]={role:'user',content:TUTOR_SYS+hist[0].content};
+  tutor.msgs.push(ai);tutor.busy=true;render();
+  tutor.ctrl=new AbortController();
+  try{
+    const r=await cloud.sample(hist,{cache:false,signal:tutor.ctrl.signal,onText:({text})=>{ai.content=text;const c=$('#chat');if(c&&c.lastChild)c.lastChild.textContent=text}});
+    ai.content=(r&&r.text)||ai.content;
+  }catch(e){
+    if(e&&e.text){ai.content=e.text}
+    else{tutor.msgs.pop();tutor.msgs.push({role:'assistant',err:true,content:e&&e.code==='rate_limited'?'问得有点快，等一分钟再问吧。':e&&e.code==='not_granted'?'助教需要你允许后才能用。':'这次没有回答成功，可以再发一次。'})}
+  }
+  tutor.busy=false;tutor.ctrl=null;if(view==='tutor')render();
+}
+
+/* notes */
+views.notes=()=>{
+  const s=el('section',{class:'view'});
+  s.append(el('div',{class:'sec-h'},el('h2',{text:'他的留言'}),el('p',{class:'muted',text:cloud.isOwner?'写给她的话会贴在「今天」页最上面，最新的一张先出现。':'他写给你的每一张小纸条都在这里。'})));
+  if(cloud.isOwner&&cloud.db){
+    const ta=el('textarea',{id:'noteText',maxlength:300,placeholder:'今天想对她说点什么？'});
+    const msg=el('span',{class:'muted',style:'font-size:13px'});
+    const b=el('button',{class:'btn primary',type:'button',onclick:async()=>{
+      const v=ta.value.trim();if(!v){msg.textContent='先写点什么吧。';return}
+      b.disabled=true;
+      try{await cloud.db.collection('notes').add({text:v,at:Date.now()});ta.value='';msg.textContent='贴上去了。'}
+      catch(e){msg.textContent=e&&e.code==='quota_exceeded'?'留言太多了，先撕掉几张旧的。':'没有贴成功，稍后再试一次。'}
+      b.disabled=false;
+    }},'贴一张纸条');
+    s.append(el('div',{class:'compose'},el('label',{class:'f',for:'noteText'},'写一张新纸条'),ta,el('div',{class:'logrow'},b,msg)));
+  }
+  if(cloud.db&&!cloud.notesReady){s.append(el('p',{class:'muted',text:'正在取纸条…'}))}
+  else if(!cloud.notes.length){s.append(el('div',{class:'empty'},el('h3',{text:'这里还空着'}),el('p',{text:cloud.isOwner?'写下第一张给她的纸条吧。':'他的第一张纸条，很快就会出现。'})))}
+  else{
+    const g=el('div',{class:'notes'});
+    cloud.notes.forEach((n,i)=>{g.append(el('div',{class:'note',style:`--r:${[-1.4,1,-.6,1.6,-1][i%5]}deg`},el('div',{class:'from',text:'给你'}),el('div',{class:'txt',text:n.text}),el('div',{class:'meta'},el('span',{text:fmtDate(n.at)}),cloud.isOwner?el('button',{class:'del',type:'button',onclick:async()=>{try{await cloud.db.doc('notes/'+n.id).delete()}catch(e){}}},'撕掉'):el('span',{class:'heart',text:'♥'}))))});
+    s.append(g);
+  }
+  if(cloud.isOwner&&cloud.db){
+    const cfg=el('div');
+    cfg.append(el('div',{class:'sec-h'},el('h3',{text:'只有你能看到的设置'}),el('p',{class:'muted',text:'她的称呼会出现在首页问候里；里程碑奖励可以改成你真的会兑现的事。'})));
+    const name=el('input',{type:'text',id:'herName',value:cloud.config.herName||'',placeholder:'比如：宝贝',maxlength:20});
+    const grid=el('div',{class:'cfg'},el('label',{class:'f',for:'herName'},'她的称呼',name));
+    const inputs={};
+    MILES.forEach(h=>{const i=el('input',{type:'text',id:'rw'+h,value:(cloud.config.rewards||{})[h]||'',placeholder:DEFAULT_REWARDS[h],maxlength:40});inputs[h]=i;grid.append(el('label',{class:'f',for:'rw'+h},h+' 小时的奖励',i))});
+    const msg=el('span',{class:'muted',style:'font-size:13px'});
+    const b=el('button',{class:'btn',type:'button',onclick:async()=>{
+      const rewards={};MILES.forEach(h=>{const v=inputs[h].value.trim();if(v)rewards[h]=v});
+      b.disabled=true;
+      try{await cloud.db.doc('config/site').set({herName:name.value.trim(),rewards});msg.textContent='保存好了。'}catch(e){msg.textContent='没有保存成功，稍后再试。'}
+      b.disabled=false;
+    }},'保存设置');
+    cfg.append(grid,el('div',{class:'logrow',style:'margin-top:12px'},b,msg));
+    s.append(cfg);
+  }
+  return s;
+};
+
+/* ============================== RENDER ============================== */
+function render(){
+  const app=$('#app');
+  const y=window.scrollY;
+  app.replaceChildren(views[view](),el('div',{class:'foot',html:'科目权重与模块名称参考 CFA Institute 公布的 Level I 课程大纲，以当年官网为准。练习题和闪卡是为这个网站原创的，不是官方题目。学习进度保存在这台设备的浏览器里。<br>为你做的，祝考试顺利 ♥'}));
+  document.querySelectorAll('#tabs a').forEach(a=>{if(a.dataset.v===view)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+  const due=dueCards('all').length;const b=$('#dueBadge');b.hidden=!due;b.textContent=due;
+  window.scrollTo(0,y);
+}
+function route(){
+  const h=location.hash.slice(1);
+  const nv=views[h]&&!(h==='tutor'&&!cloud.sample)?h:'today';
+  const changed=nv!==view;view=nv;
+  if(view==='cards'&&changed){fc.queue=null;fc.flipped=false}
+  render();if(changed)window.scrollTo(0,0);
+}
+addEventListener('hashchange',route);
+route();
+setSync('local',window.claude&&window.claude.use?'正在连接…':'保存在这台设备上');
+
+/* ============================== NOTES FROM notes.json ============================== */
+setSync('local','保存在这台设备上');
+fetch('notes.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
+  if(!d)return;
+  cloud.config={herName:d.herName||'',rewards:d.rewards||{}};
+  cloud.notes=(Array.isArray(d.notes)?d.notes:[]).map((n,i)=>({id:'n'+i,text:String(n.text||'').trim(),at:n.date?parse(String(n.date)).getTime():0})).filter(n=>n.text).sort((a,b)=>b.at-a.at);
+  render();
+}).catch(()=>{});
+</script>
+
+</body>
+</html>
